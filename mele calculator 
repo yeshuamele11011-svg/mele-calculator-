@@ -1,4 +1,4 @@
-main.py
+import random
 
 import random
 from kivy.app import App
