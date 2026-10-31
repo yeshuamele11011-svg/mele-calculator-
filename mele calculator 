@@ -1,1 +1,108 @@
 main.py
+
+import random
+from kivy.app import App
+from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.gridlayout import GridLayout
+from kivy.uix.button import Button
+from kivy.uix.textinput import TextInput
+from kivy.core.window import Window
+
+Window.clearcolor = (0.04, 0.04, 0.04, 1)
+
+class WrongCalculator(App):
+    def build(self):
+        self.expression = ""
+
+        root = BoxLayout(
+            orientation="vertical",
+            padding=15,
+            spacing=12
+        )
+
+        title = Button(
+            text="MR.11 CALCULATOR",
+            font_size=23,
+            bold=True,
+            color=(1, 0.55, 0, 1),
+            background_normal="",
+            background_color=(0.08, 0.08, 0.08, 1),
+            size_hint_y=0.15
+        )
+        root.add_widget(title)
+
+        self.display = TextInput(
+            text="0",
+            font_size=38,
+            halign="right",
+            multiline=False,
+            readonly=True,
+            background_color=(0.10, 0.10, 0.10, 1),
+            foreground_color=(1, 1, 1, 1),
+            size_hint_y=0.22
+        )
+        root.add_widget(self.display)
+
+        grid = GridLayout(cols=4, spacing=8)
+
+        buttons = [
+            "C", "⌫", "%", "÷",
+            "7", "8", "9", "×",
+            "4", "5", "6", "−",
+            "1", "2", "3", "+",
+            "00", "0", ".", "="
+        ]
+
+        for item in buttons:
+            btn = Button(
+                text=item,
+                font_size=25,
+                bold=True,
+                background_normal="",
+                background_color=(
+                    (0.95, 0.40, 0.02, 1)
+                    if item in ["÷", "×", "−", "+", "="]
+                    else (0.16, 0.16, 0.16, 1)
+                ),
+                color=(1, 1, 1, 1)
+            )
+            btn.bind(on_press=self.press)
+            grid.add_widget(btn)
+
+        root.add_widget(grid)
+        return root
+
+    def press(self, button):
+        value = button.text
+
+        if value == "C":
+            self.expression = ""
+
+        elif value == "⌫":
+            self.expression = self.expression[:-1]
+
+        elif value == "=":
+            try:
+                exp = self.expression.replace("×", "*")
+                exp = exp.replace("÷", "/")
+                exp = exp.replace("−", "-")
+
+                result = eval(exp, {"__builtins__": {}}, {})
+
+                if isinstance(result, (int, float)):
+                    result += random.choice([1, 2, 3, 5, 7, 10])
+
+                self.expression = str(result)
+
+            except:
+                self.expression = "Error"
+
+        elif value == "%":
+            self.expression += "/100"
+
+        else:
+            self.expression += value
+
+        self.display.text = self.expression or "0"
+
+WrongCalculator().run()
